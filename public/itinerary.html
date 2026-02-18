@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Hotel | Manager Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root { --primary: #1a365d; --accent: #3b82f6; --bg: #f4f7f6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+        .brand { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+        .logo-img { height: 35px; border-radius: 4px; }
+        .brand-text { font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+        .menu { flex: 1; padding: 20px 0; overflow-y: auto; }
+        .menu-item { 
+            padding: 15px 30px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            color: #cfd8dc; 
+            transition: 0.2s; 
+            border-left: 4px solid transparent; 
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .menu-item.active { background: rgba(255,255,255,0.1); border-left-color: var(--accent); color: white; font-weight: 600; }
+        
+        /* AI Feature Badge in Menu */
+        .ai-badge { margin-left: auto; font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #fbbf24; }
+
+        .sidebar-footer { padding: 20px; font-size: 0.75rem; color: rgba(255,255,255,0.4); text-align: center; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* Main Area */
+        .main { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        h2 { font-size: 26px; font-weight: 700; color: var(--primary); margin: 0; }
+        
+        .btn { 
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-group { display: flex; gap: 10px; }
+
+        /* Health Panel */
+        .health-panel { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+        }
+        .health-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--primary); }
+        .health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .health-item { 
+            padding: 12px; 
+            background: #f8f9fa; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .health-icon { font-size: 1.5rem; }
+        .health-icon.online { color: #27ae60; }
+        .health-icon.offline { color: #e74c3c; }
+        .health-icon.warning { color: #f39c12; }
+        .health-info { flex: 1; }
+        .health-label { font-size: 0.75rem; color: #7f8c8d; text-transform: uppercase; }
+        .health-value { font-size: 0.95rem; font-weight: 600; color: #2c3e50; }
+
+        /* Grid & Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .card { 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); 
+            overflow: hidden; 
+            border: 1px solid #eee; 
+            transition: transform 0.2s; 
+            cursor: pointer; 
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        
+        .card-status-bar { height: 6px; }
+        .card.open .card-status-bar { background: #f39c12; }
+        .card.urgent .card-status-bar { background: #e74c3c; }
+        .card.completed .card-status-bar { background: #27ae60; }
+
+        .card-body { padding: 20px; }
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            color: #7f8c8d; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+        }
+        .main-info { font-size: 1.2rem; font-weight: 700; color: #2c3e50; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .sub-info { font-size: 0.95rem; color: #555; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .meta-info { 
+            font-size: 0.9rem; 
+            color: #777; 
+            margin-top: 12px; 
+            padding-top: 12px; 
+            border-top: 1px dashed #eee; 
+            font-style: italic; 
+        }
+        .icon-box { color: var(--accent); width: 20px; text-align: center; }
+
+        .status-badge { 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+        }
+        .status-badge.open { background: #fff3cd; color: #856404; }
+        .status-badge.completed { background: #d4edda; color: #155724; }
+        .status-badge.urgent { background: #f8d7da; color: #721c24; }
+
+        /* Analytics */
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+        }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 0.9rem; color: #7f8c8d; margin-top: 5px; }
+
+        .chart-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+            margin-bottom: 20px; 
+        }
+        .chart-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: var(--primary); }
+
+        /* AI Tools Styling */
+        .ai-tool-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .form-textarea { min-height: 120px; resize: vertical; }
+        .ai-result-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #334155;
+            display: none;
+        }
+        .ai-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .ai-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+
+        .loader { display: none; text-align: center; padding: 50px; color: #bdc3c7; }
+        .empty-state { text-align: center; padding: 50px; color: #7f8c8d; font-style: italic; }
+
+        /* Modal */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            max-width: 400px; 
+            width: 90%; 
+        }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--primary); }
+        .modal-btn-group { display: flex; gap: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">
+            <img src="./hotel.jpeg" alt="Logo" class="logo-img" id="sidebar-logo">
+            <div class="brand-text" id="sidebar-brand">ORION HOTEL</div>
+        </div>
+        
+        <div class="menu">
+            <div class="menu-item active" onclick="loadTab('RESTAURANT RESERVATIONS', 'Dining Bookings')">
+                <i class="fas fa-utensils"></i> <span>Dining</span>
+            </div>
+            <div class="menu-item" onclick="loadTab('HOUSEKEEPING', 'Housekeeping')">
+                <i class="fas fa-broom"></i> <span>Housekeeping</span>
+            </div>
+            <div class="menu-item" onclick="loadTab('MAINTENANCE', 'Maintenance')">
+                <i class="fas fa-tools"></i> <span>Maintenance</span>
+            </div>
+            <div class="menu-item" onclick="loadTab('HOTEL RESERVATIONS', 'Room Bookings')">
+                <i class="fas fa-bed"></i> <span>Room Bookings</span>
+            </div>
+            <div class="menu-item" onclick="loadTab('ANALYTICS', 'Analytics')">
+                <i class="fas fa-chart-line"></i> <span>Analytics</span>
+            </div>
+            
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 20px;"></div>
+            <div style="padding: 10px 30px; font-size: 0.75rem; color: #64748b; font-weight: bold;">AI TOOLS</div>
+
+            <div class="menu-item" onclick="loadTab('ITINERARY', 'Itinerary Planner')">
+                <i class="fas fa-map-marked-alt"></i> <span>Itinerary Planner</span> <span class="ai-badge">AI</span>
+            </div>
+            <div class="menu-item" onclick="loadTab('RESPONSE', 'Response Assistant')">
+                <i class="fas fa-comment-dots"></i> <span>Response Assistant</span> <span class="ai-badge">AI</span>
+            </div>
+
+            <div class="menu-item" onclick="loadTab('SYSTEM', 'System Health')">
+                <i class="fas fa-heartbeat"></i> <span>System Health</span>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            Powered by <i class="fas fa-bolt"></i> <strong>Gemini 2.0 Flash</strong>
+        </div>
+    </div>
+
+    <div class="main">
+        <header>
+            <h2 id="page-title">Dining Bookings</h2>
+            <div class="btn-group" id="header-actions">
+                <button class="btn" onclick="fetchData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn" onclick="toggleFilter()"><i class="fas fa-filter"></i> <span id="filter-text">Show All</span></button>
+            </div>
+        </header>
+
+        <div id="health-section"></div>
+        <div id="analytics-section"></div>
+        <div id="ai-tools-section"></div>
+
+        <div class="loader" id="loader"><i class="fas fa-circle-notch fa-spin"></i> Loading data...</div>
+        <div class="grid" id="data-grid"></div>
+    </div>
+
+    <!-- Status Update Modal -->
+    <div class="modal" id="status-modal">
+        <div class="modal-content">
+            <div class="modal-title">Update Ticket Status</div>
+            <p id="modal-info"></p>
+            <div class="modal-btn-group">
+                <button class="btn" onclick="updateStatus('Open')">Open</button>
+                <button class="btn" onclick="updateStatus('In Progress')">In Progress</button>
+                <button class="btn" onclick="updateStatus('Completed')" style="background:#27ae60">Completed</button>
+            </div>
+            <button class="btn" onclick="closeModal()" style="background:#95a5a6; margin-top:10px; width:100%">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Load Config
+        const CONFIG = {
+            branding: { name: "ZAR Hotel", logo: "./hotel.jpeg" },
+            system: { backend: { scriptUrl: "https://script.google.com/macros/s/AKfycbwFIRNeSUkKCcuv9oN2p0CbXXoqvNbNWHbjuJ1Ef9wdRI0rFzFMjQWOuZWd6_LpcR4b/exec" } }
+        };
+
+        // Apply branding
+        document.getElementById('sidebar-brand').innerText = CONFIG.branding.name.toUpperCase();
+        document.getElementById('sidebar-logo').src = CONFIG.branding.logo;
+        document.title = CONFIG.branding.name + " | Dashboard";
+
+        // API URL
+        const API_URL = CONFIG.system.backend.scriptUrl;
+        
+        let currentTab = 'RESTAURANT RESERVATIONS';
+        let currentFilter = 'all';
+        let selectedRow = null;
+
+        function loadTab(tabName, title) {
+            currentTab = tabName;
+            document.getElementById('page-title').innerText = title;
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Reset sections
+            document.getElementById('health-section').innerHTML = '';
+            document.getElementById('analytics-section').innerHTML = '';
+            document.getElementById('ai-tools-section').innerHTML = '';
+            document.getElementById('data-grid').innerHTML = '';
+            
+            // Show/Hide Header Actions
+            const headerActions = document.getElementById('header-actions');
+            if (tabName === 'ITINERARY' || tabName === 'RESPONSE' || tabName === 'SYSTEM' || tabName === 'ANALYTICS') {
+                headerActions.style.display = 'none';
+            } else {
+                headerActions.style.display = 'flex';
+            }
+
+            // Route Logic
+            if (tabName === 'ANALYTICS') {
+                loadAnalytics();
+            } else if (tabName === 'SYSTEM') {
+                loadSystemHealth();
+            } else if (tabName === 'ITINERARY') {
+                renderItineraryTool();
+            } else if (tabName === 'RESPONSE') {
+                renderResponseTool();
+            } else {
+                fetchData();
+            }
+        }
+
+        function toggleFilter() {
+            currentFilter = currentFilter === 'all' ? 'open' : 'all';
+            document.getElementById('filter-text').innerText = currentFilter === 'all' ? 'Show All' : 'Open Only';
+            fetchData();
+        }
+
+        // --- DATA FETCHING ---
+        async function fetchData() {
+            const grid = document.getElementById('data-grid');
+            const loader = document.getElementById('loader');
+            
+            grid.innerHTML = '';
+            loader.style.display = 'block';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "fetch_data", tab: currentTab, filter: currentFilter })
+                });
+                const json = await response.json();
+                
+                if (json.status === 'success') {
+                    renderData(json.data);
+                }
+            } catch (error) {
+                grid.innerHTML = '<div class="empty-state">❌ Failed to connect to system</div>';
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        // --- HELPER: Format dates nicely ---
+        function formatCheckInDate(dateString) {
+            try {
+                if (!dateString) return "N/A";
+                const d = new Date(dateString);
+                if (isNaN(d.getTime())) return dateString;
+                
+                return d.toLocaleDateString('en-ZA', { 
+                    weekday: 'short', 
+                    day: 'numeric', 
+                    month: 'short', 
+                    year: 'numeric' 
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // --- HELPER: Format Dining Date & Time ---
+        function formatDiningDate(dateString) {
+            try {
+                if (!dateString) return "N/A";
+                const d = new Date(dateString);
+                if (isNaN(d.getTime())) return dateString; 
+                
+                // Format: Sun, 25 Jan, 19:00
+                return d.toLocaleDateString('en-ZA', { 
+                    weekday: 'short', 
+                    day: 'numeric', 
+                    month: 'short', 
+                    // year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        function renderData(rows) {
+            const grid = document.getElementById('data-grid');
+            if (!rows || rows.length < 2) {
+                grid.innerHTML = '<div class="empty-state">No tickets found</div>';
+                return;
+            }
+
+            const dataRows = rows.slice(1).reverse();
+
+            dataRows.forEach((row, idx) => {
+                const statusCol = getStatusCol(currentTab);
+                const status = statusCol >= 0 && row[statusCol] ? row[statusCol].toLowerCase() : 'open';
+                const statusClass = status.includes('complete') || status.includes('confirmed') ? 'completed' : 
+                                   status.includes('urgent') ? 'urgent' : 'open';
+                
+                // Creation Timestamp
+                const dateStr = row[0] ? new Date(row[0]).toLocaleString('en-ZA', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) : "N/A";
+                
+                let bodyHtml = '';
+
+                if (currentTab === 'RESTAURANT RESERVATIONS') {
+                    // row[4] is Time. Apply new dining formatter
+                    const cleanTime = formatDiningDate(row[4]);
+
+                    bodyHtml = `
+                        <div class="main-info"><i class="fas fa-user icon-box"></i> ${row[1]} <span style="font-size:0.8em; color:#777;">(${row[3]} ppl)</span></div>
+                        <div class="sub-info"><i class="far fa-clock icon-box"></i> <strong>Time:</strong> ${cleanTime}</div>
+                        <div class="sub-info"><i class="fas fa-phone icon-box"></i> ${row[2]}</div>
+                        ${row[7] ? `<div class="meta-info">"${row[7]}"</div>` : ''} 
+                    `;
+                } 
+                else if (currentTab === 'HOUSEKEEPING') {
+                    bodyHtml = `
+                        <div class="main-info"><i class="fas fa-door-closed icon-box"></i> Room ${row[1]}</div>
+                        <div class="sub-info"><i class="fas fa-user icon-box"></i> ${row[2]}</div>
+                        <div class="meta-info"><strong>Request:</strong> ${row[3]}</div>
+                    `;
+                }
+                else if (currentTab === 'MAINTENANCE') {
+                    bodyHtml = `
+                        <div class="main-info"><i class="fas fa-tools icon-box"></i> Room ${row[2]}</div>
+                        <div class="sub-info"><i class="fas fa-user icon-box"></i> ${row[1]}</div>
+                        <div class="meta-info"><strong>Issue:</strong> ${row[3]}</div>
+                    `;
+                }
+                else if (currentTab === 'HOTEL RESERVATIONS') {
+                    // row[6] is Check-in date. We format it here.
+                    const cleanDate = formatCheckInDate(row[6]);
+                    
+                    bodyHtml = `
+                        <div class="main-info"><i class="fas fa-suitcase icon-box"></i> ${row[1]}</div>
+                        <div class="sub-info"><i class="far fa-calendar-alt icon-box"></i> ${cleanDate} (${row[7]} nights)</div>
+                        <div class="sub-info"><i class="fas fa-phone icon-box"></i> ${row[2]}</div>
+                        <div class="meta-info">Pax: ${row[5]} | Email: ${row[3]}</div>
+                    `;
+                }
+
+                const card = `
+                    <div class="card ${statusClass}" onclick="openStatusModal(${idx + 2})">
+                        <div class="card-status-bar"></div>
+                        <div class="card-body">
+                            <div class="card-header">
+                                <span class="status-badge ${statusClass}">${status.toUpperCase()}</span>
+                                <span>${dateStr}</span>
+                            </div>
+                            ${bodyHtml}
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function openStatusModal(rowIndex) {
+            selectedRow = rowIndex;
+            document.getElementById('modal-info').innerText = `Update status for row ${rowIndex}`;
+            document.getElementById('status-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('status-modal').style.display = 'none';
+            selectedRow = null;
+        }
+
+        async function updateStatus(newStatus) {
+            if (!selectedRow) return;
+
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "update_status",
+                        tab: currentTab,
+                        rowIndex: selectedRow,
+                        newStatus: newStatus
+                    })
+                });
+                closeModal();
+                fetchData();
+            } catch (error) {
+                alert("Failed to update status");
+            }
+        }
+
+        // --- AI TOOLS ---
+        function renderItineraryTool() {
+            const container = document.getElementById('ai-tools-section');
+            container.innerHTML = `
+                <div class="ai-tool-container">
+                    <h3 style="margin-bottom:20px; color:#2c3e50;"><i class="fas fa-map-marked-alt" style="color:#6366f1"></i> Guest Itinerary Planner</h3>
+                    <div class="form-group">
+                        <label class="form-label">Guest Interests</label>
+                        <input type="text" id="ai-interests" class="form-input" placeholder="e.g. Beaches, History, Food, Kids activities...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Duration (Days)</label>
+                        <select id="ai-days" class="form-select">
+                            <option value="1">1 Day</option>
+                            <option value="2">2 Days</option>
+                            <option value="3">3 Days</option>
+                            <option value="5">5 Days</option>
+                            <option value="7">1 Week</option>
+                        </select>
+                    </div>
+                    <button class="ai-btn" onclick="generateItinerary()"><i class="fas fa-magic"></i> Generate Plan</button>
+                    <div id="ai-result" class="ai-result-box"></div>
+                </div>
+            `;
+        }
+
+        function renderResponseTool() {
+            const container = document.getElementById('ai-tools-section');
+            container.innerHTML = `
+                <div class="ai-tool-container">
+                    <h3 style="margin-bottom:20px; color:#2c3e50;"><i class="fas fa-comment-dots" style="color:#6366f1"></i> Staff Response Assistant</h3>
+                    <div class="form-group">
+                        <label class="form-label">Guest Name</label>
+                        <input type="text" id="ai-guest-name" class="form-input" placeholder="Guest Name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Situation / Request</label>
+                        <textarea id="ai-situation" class="form-textarea" placeholder="e.g. Guest is unhappy about street noise, wants a room change but we are fully booked."></textarea>
+                    </div>
+                    <button class="ai-btn" onclick="generateResponse()"><i class="fas fa-pen-fancy"></i> Draft Response</button>
+                    <div id="ai-result" class="ai-result-box"></div>
+                </div>
+            `;
+        }
+
+        async function generateItinerary() {
+            const interests = document.getElementById('ai-interests').value;
+            const days = document.getElementById('ai-days').value;
+            const resultBox = document.getElementById('ai-result');
+            
+            if(!interests) { alert("Please enter guest interests"); return; }
+            
+            resultBox.style.display = 'block';
+            resultBox.innerText = "✨ Gemini is creating a plan...";
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "plan_itinerary", interests: interests, days: days })
+                });
+                const json = await response.json();
+                if(json.status === 'success') {
+                    resultBox.innerText = json.plan;
+                } else {
+                    resultBox.innerText = "Error generating plan.";
+                }
+            } catch(e) { resultBox.innerText = "Connection error."; }
+        }
+
+        async function generateResponse() {
+            const name = document.getElementById('ai-guest-name').value;
+            const details = document.getElementById('ai-situation').value;
+            const resultBox = document.getElementById('ai-result');
+            
+            if(!details) { alert("Please describe the situation"); return; }
+            
+            resultBox.style.display = 'block';
+            resultBox.innerText = "✨ Gemini is drafting response options...";
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "suggest_response", guestName: name || "Guest", details: details })
+                });
+                const json = await response.json();
+                if(json.status === 'success') {
+                    resultBox.innerText = json.suggestion;
+                } else {
+                    resultBox.innerText = "Error generating response.";
+                }
+            } catch(e) { resultBox.innerText = "Connection error."; }
+        }
+
+        // --- ANALYTICS & HEALTH ---
+        async function loadAnalytics() {
+            const section = document.getElementById('analytics-section');
+            section.innerHTML = '<div class="loader"><i class="fas fa-circle-notch fa-spin"></i> Loading analytics...</div>';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "get_analytics", range: 7 })
+                });
+                const json = await response.json();
+
+                if (json.status === 'success') {
+                    renderAnalytics(json.analytics);
+                }
+            } catch (error) {
+                section.innerHTML = '<div class="empty-state">Failed to load analytics</div>';
+            }
+        }
+
+        function renderAnalytics(data) {
+            const section = document.getElementById('analytics-section');
+            
+            section.innerHTML = `
+                <div class="analytics-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${data.total || 0}</div>
+                        <div class="stat-label">Total Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.open || 0}</div>
+                        <div class="stat-label">Open Tickets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.completed || 0}</div>
+                        <div class="stat-label">Completed Tickets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0}%</div>
+                        <div class="stat-label">Completion Rate</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Requests by Type</div>
+                    <canvas id="typeChart" height="80"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Requests by Hour</div>
+                    <canvas id="hourlyChart" height="80"></canvas>
+                </div>
+            `;
+
+            new Chart(document.getElementById('typeChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Restaurant', 'Housekeeping', 'Maintenance', 'Room Bookings'],
+                    datasets: [{
+                        data: [
+                            data.byType.restaurant || 0,
+                            data.byType.housekeeping || 0,
+                            data.byType.maintenance || 0,
+                            data.byType.bookings || 0
+                        ],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
+                    }]
+                }
+            });
+
+            new Chart(document.getElementById('hourlyChart'), {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: 24}, (_, i) => i + ':00'),
+                    datasets: [{
+                        label: 'Requests',
+                        data: data.hourly || [],
+                        backgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        async function loadSystemHealth() {
+            const section = document.getElementById('health-section');
+            section.innerHTML = '<div class="loader"><i class="fas fa-circle-notch fa-spin"></i> Checking system health...</div>';
+
+            try {
+                const response = await fetch(API_URL + '?action=health');
+                const health = await response.json();
+
+                section.innerHTML = `
+                    <div class="health-panel">
+                        <div class="health-title">🏥 System Status</div>
+                        <div class="health-grid">
+                            <div class="health-item">
+                                <i class="fas fa-brain health-icon ${health.services.gemini === 'online' ? 'online' : 'offline'}"></i>
+                                <div class="health-info">
+                                    <div class="health-label">Gemini AI</div>
+                                    <div class="health-value">${health.services.gemini || 'Unknown'}</div>
+                                </div>
+                            </div>
+                            <div class="health-item">
+                                <i class="fas fa-table health-icon ${health.services.sheets === 'online' ? 'online' : 'offline'}"></i>
+                                <div class="health-info">
+                                    <div class="health-label">Google Sheets</div>
+                                    <div class="health-value">${health.services.sheets || 'Unknown'}</div>
+                                </div>
+                            </div>
+                            <div class="health-item">
+                                <i class="fab fa-discord health-icon ${health.services.discord > 0 ? 'online' : 'warning'}"></i>
+                                <div class="health-info">
+                                    <div class="health-label">Discord Webhooks</div>
+                                    <div class="health-value">${health.services.discord || 0} Active</div>
+                                </div>
+                            </div>
+                            <div class="health-item">
+                                <i class="fas fa-clock health-icon online"></i>
+                                <div class="health-info">
+                                    <div class="health-label">System Version</div>
+                                    <div class="health-value">${health.version || '2.0'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                section.innerHTML = '<div class="empty-state">❌ Failed to check system health</div>';
+            }
+        }
+
+        function getStatusCol(tab) {
+            const cols = {
+                "RESTAURANT RESERVATIONS": 8,
+                "HOUSEKEEPING": 4,
+                "MAINTENANCE": 4,
+                "HOTEL RESERVATIONS": 9
+            };
+            return cols[tab] !== undefined ? cols[tab] : -1;
+        }
+
+        // Initial load
+        fetchData();
+    </script>
+</body>
+</html>

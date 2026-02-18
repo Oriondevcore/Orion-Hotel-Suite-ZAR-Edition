@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION Commercial Architect v18.0 (Claude + Gemini Powered)</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0f0505 0%, #1a0a0a 50%, #0B1221 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0,0,0,0.4);
+            border-bottom: 2px solid #FFB627;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #FFB627;
+            font-weight: 700;
+        }
+
+        .claude-badge {
+            background: rgba(139, 37, 0, 0.3);
+            border: 1px solid #FFB627;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #FFB627;
+        }
+
+        .price-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8B2500 0%, #C15817 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(139, 37, 0, 0.6);
+            z-index: 9998;
+            min-width: 280px;
+            border: 2px solid #FFB627;
+            text-align: center;
+        }
+
+        .price-badge-title {
+            font-size: 0.75rem;
+            color: #FFB627;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-badge-monthly {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-badge-setup {
+            font-size: 0.85rem;
+            color: #FFB627;
+        }
+
+        .james-story {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .james-box {
+            background: rgba(255, 182, 39, 0.1);
+            border: 2px solid #FFB627;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .james-box-title {
+            color: #FFB627;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #FFB627;
+            padding-bottom: 0.5rem;
+        }
+
+        .james-feature {
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+        }
+
+        .james-feature::before {
+            content: "→ ";
+            color: #FFB627;
+            font-weight: 700;
+            margin-left: -1rem;
+            margin-right: 0.5rem;
+        }
+
+        .input-field {
+            background: rgba(11, 13, 19, 0.6);
+            border: 1px solid rgba(193, 88, 23, 0.4);
+            color: #e8e1d5;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #FFB627;
+            background: rgba(11, 13, 19, 0.8);
+        }
+
+        .rvc-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .rvc-card {
+            background: rgba(193, 88, 23, 0.1);
+            border: 1px solid rgba(193, 88, 23, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .rvc-card:hover {
+            border-color: #FFB627;
+            background: rgba(193, 88, 23, 0.2);
+        }
+
+        .rvc-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(193, 88, 23, 0.3);
+            padding-bottom: 0.75rem;
+        }
+
+        .rvc-card-title {
+            color: #FFB627;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .rvc-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            background: #8B2500;
+            color: white;
+            border: 1px solid #FFB627;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .btn-small:hover {
+            background: #FFB627;
+            color: #0f0505;
+        }
+
+        .rvc-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .rvc-input-group input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(193, 88, 23, 0.2);
+            color: #e0e0e0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: #FFB627;
+            color: #0f0505;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: #FFD966;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 182, 39, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(193, 88, 23, 0.2);
+            color: #FFB627;
+            border: 1px solid #FFB627;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(193, 88, 23, 0.3);
+        }
+
+        .firebase-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #FFB627;
+            color: #FFB627;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            z-index: 9999;
+        }
+
+        .firebase-status.connected::before {
+            content: "● ";
+            color: #22c55e;
+        }
+
+        .firebase-status.disconnected::before {
+            content: "● ";
+            color: #ef4444;
+        }
+
+        .contract-section {
+            background: rgba(11, 13, 19, 0.6);
+            border: 1px solid #FFB627;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .signature-pad {
+            border: 2px dashed #FFB627;
+            border-radius: 8px;
+            margin: 1rem 0;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .footer {
+            background: rgba(0,0,0,0.4);
+            border-top: 2px solid #FFB627;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 3rem;
+            color: #FFB627;
+            font-size: 0.75rem;
+        }
+
+        .section-title {
+            color: #FFB627;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            margin-top: 2rem;
+            border-bottom: 2px solid #FFB627;
+            padding-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="firebase-status disconnected" id="fbStatus">Firebase: Connecting...</div>
+    <div class="price-badge" id="priceBadge">
+        <div class="price-badge-title">LIVE TOTAL (ZAR)</div>
+        <div class="price-badge-monthly" id="monthlyPrice">R 0</div>
+        <div class="price-badge-setup" id="setupPrice">Setup: R 0</div>
+    </div>
+
+    <div class="header">
+        <div>
+            <h1>ORION COMMERCIAL ARCHITECT v18.0</h1>
+            <p style="color: #999; font-size: 0.85rem;">Powered by Claude AI + Gemini</p>
+        </div>
+        <div class="claude-badge">
+            Built with Claude AI<br/>+ Graham Schubach<br/>Orion Dev Core
+        </div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 0 auto; padding: 2rem;">
+
+        <!-- JAMES STORY BOXES -->
+        <div class="james-story" id="jamesStory">
+            <div class="james-box">
+                <div class="james-box-title">🔑 PRE-STAY</div>
+                <div class="james-feature">Keycard + Check-in</div>
+                <div class="james-feature">Biometric verification</div>
+                <div class="james-feature">Directions to hotel</div>
+                <div class="james-feature">Itinerary planner</div>
+            </div>
+            <div class="james-box">
+                <div class="james-box-title">🏨 IN-HOUSE</div>
+                <div class="james-feature">Loadshedding alerts</div>
+                <div class="james-feature">Revenue upsells</div>
+                <div class="james-feature">Outlet planning</div>
+                <div class="james-feature">Guest support 24/7</div>
+            </div>
+            <div class="james-box">
+                <div class="james-box-title">✅ POST-STAY</div>
+                <div class="james-feature">Settle final bill</div>
+                <div class="james-feature">Google review link</div>
+                <div class="james-feature">POPI data deletion</div>
+                <div class="james-feature">Loyalty tracking</div>
+            </div>
+        </div>
+
+        <!-- HOTEL IDENTITY -->
+        <div class="section-title">1. Hotel Identity</div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
+            <input type="text" id="hotelName" class="input-field" placeholder="Hotel Name">
+            <input type="text" id="hotelCity" class="input-field" placeholder="City">
+            <input type="number" id="hotelRooms" class="input-field" placeholder="Total Rooms" value="42">
+            <input type="number" id="hotelStars" class="input-field" placeholder="Star Rating" value="3.5" step="0.1">
+            <input type="email" id="hotelEmail" class="input-field" placeholder="Hotel Email">
+            <input type="tel" id="hotelPhone" class="input-field" placeholder="Hotel Phone">
+        </div>
+
+        <!-- REVENUE CENTERS -->
+        <div class="section-title">2. Revenue Centers (RVCs)</div>
+        <div class="rvc-container" id="rvcContainer"></div>
+        <button class="btn-secondary" onclick="addRVC()">+ Add RVC</button>
+
+        <!-- CONTRACT & SIGNATURE -->
+        <div class="contract-section">
+            <div class="section-title">3. Contract & Signature</div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="color: #FFB627; display: block; margin-bottom: 0.5rem; font-weight: 700;">General Manager Name</label>
+                <input type="text" id="gmName" class="input-field" placeholder="GM Name">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="color: #FFB627; display: block; margin-bottom: 0.5rem; font-weight: 700;">Client Signature (Draw below)</label>
+                <canvas id="signaturePad" class="signature-pad" width="800" height="200"></canvas>
+                <button class="btn-secondary" onclick="clearSignature()" style="width: auto; margin-top: 0.5rem;">Clear Signature</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button class="btn-primary" onclick="generatePDF()">📄 Generate PDF Contract</button>
+                <button class="btn-primary" onclick="saveToFirebase()">💾 Save to Firebase</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>ORION HOTEL SUITE v18.0 | Built by Claude AI + Graham Schubach | Orion Dev Core</p>
+        <p style="margin-top: 0.5rem;">Firebase Realtime Database | POPIA Compliant | Data Encrypted</p>
+    </div>
+
+    <script>
+        // FIREBASE CONFIG
+        const firebaseConfig = {
+  apiKey: "AIzaSyB9zXmQRdTFDfw_hNz8ee0e989BA79scq0",
+  authDomain: "orion-hotel-suite.firebaseapp.com",
+  databaseURL: "https://orion-hotel-suite-default-rtdb.firebaseio.com",
+  projectId: "orion-hotel-suite",
+  storageBucket: "orion-hotel-suite.firebasestorage.app",
+  messagingSenderId: "702147908",
+  appId: "1:702147908:web:58ed26d6d248086256bb11",
+  measurementId: "G-DESQDX97QB"
+};
+
+        // Initialize Firebase
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            document.getElementById('fbStatus').textContent = 'Firebase: Connected ✓';
+            document.getElementById('fbStatus').classList.add('connected');
+            document.getElementById('fbStatus').classList.remove('disconnected');
+        } catch (e) {
+            console.log('Firebase init note:', e.message);
+            document.getElementById('fbStatus').textContent = 'Firebase: Offline Mode';
+        }
+
+        // RVC DATA
+        const defaultRVCs = [
+            { name: 'Restaurants', basePrice: 5000 },
+            { name: 'Bars', basePrice: 2000 },
+            { name: 'Spas', basePrice: 3000 },
+            { name: 'Pools', basePrice: 1500 },
+            { name: 'Gyms', basePrice: 1000 },
+            { name: 'Coffee Shops', basePrice: 800 }
+        ];
+
+        let rvcs = [...defaultRVCs];
+        let signatureCanvas = null;
+        let signatureContext = null;
+        let isDrawing = false;
+
+        // INITIALIZE SIGNATURE PAD
+        function initSignaturePad() {
+            signatureCanvas = document.getElementById('signaturePad');
+            signatureContext = signatureCanvas.getContext('2d');
+            
+            signatureCanvas.addEventListener('mousedown', startDrawing);
+            signatureCanvas.addEventListener('mousemove', draw);
+            signatureCanvas.addEventListener('mouseup', stopDrawing);
+            signatureCanvas.addEventListener('mouseout', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = signatureCanvas.getBoundingClientRect();
+            signatureContext.beginPath();
+            signatureContext.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = signatureCanvas.getBoundingClientRect();
+            signatureContext.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            signatureContext.strokeStyle = '#FFB627';
+            signatureContext.lineWidth = 2;
+            signatureContext.lineCap = 'round';
+            signatureContext.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearSignature() {
+            signatureContext.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+        }
+
+        // RENDER RVCs
+        function renderRVCs() {
+            const container = document.getElementById('rvcContainer');
+            container.innerHTML = '';
+            
+            rvcs.forEach((rvc, idx) => {
+                const card = document.createElement('div');
+                card.className = 'rvc-card';
+                card.innerHTML = `
+                    <div class="rvc-card-header">
+                        <div class="rvc-card-title">${rvc.name}</div>
+                        <button class="btn-small" onclick="removeRVC(${idx})">✕</button>
+                    </div>
+                    <div class="rvc-input-group">
+                        <input type="text" placeholder="Label" value="${rvc.name}" onchange="rvcs[${idx}].name = this.value; calculatePrices()">
+                        <input type="number" placeholder="Base Price" value="${rvc.basePrice}" onchange="rvcs[${idx}].basePrice = parseInt(this.value); calculatePrices()" style="width: 100px;">
+                    </div>
+                    <div class="rvc-input-group">
+                        <input type="number" placeholder="Multiplier" value="${rvc.multiplier || 1}" onchange="rvcs[${idx}].multiplier = parseFloat(this.value); calculatePrices()" style="width: 100px;">
+                        <input type="number" placeholder="Qty" value="${rvc.quantity || 1}" onchange="rvcs[${idx}].quantity = parseInt(this.value); calculatePrices()" style="width: 70px;">
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addRVC() {
+            rvcs.push({ name: 'New RVC', basePrice: 1000, multiplier: 1, quantity: 1 });
+            renderRVCs();
+            calculatePrices();
+        }
+
+        function removeRVC(idx) {
+            rvcs.splice(idx, 1);
+            renderRVCs();
+            calculatePrices();
+        }
+
+        // CALCULATE PRICING
+        function calculatePrices() {
+            let monthly = 999; // Base
+            let setup = 4999; // Base
+
+            rvcs.forEach(rvc => {
+                const price = (rvc.basePrice || 0) * (rvc.multiplier || 1) * (rvc.quantity || 1);
+                monthly += price;
+            });
+
+            document.getElementById('monthlyPrice').textContent = 'R ' + monthly.toLocaleString();
+            document.getElementById('setupPrice').textContent = 'Setup: R ' + setup.toLocaleString();
+        }
+
+        // GENERATE PDF
+        function generatePDF() {
+            const hotelName = document.getElementById('hotelName').value || 'Hotel';
+            const gmName = document.getElementById('gmName').value || 'Client';
+            
+            const monthly = parseInt(document.getElementById('monthlyPrice').textContent.replace('R ', '').replace(/,/g, ''));
+            const setup = parseInt(document.getElementById('setupPrice').textContent.replace('Setup: R ', '').replace(/,/g, ''));
+
+            const content = `
+                <div style="padding: 40px; font-family: 'Space Grotesk';">
+                    <h1 style="color: #FFB627; text-align: center; margin-bottom: 40px;">ORION HOTEL SUITE</h1>
+                    <h2 style="color: #FFB627; border-bottom: 2px solid #FFB627; padding-bottom: 10px;">COMMERCIAL AGREEMENT v18.0</h2>
+                    
+                    <h3 style="margin-top: 30px;">Hotel Details</h3>
+                    <p><strong>Hotel:</strong> ${hotelName}</p>
+                    <p><strong>City:</strong> ${document.getElementById('hotelCity').value}</p>
+                    <p><strong>Rooms:</strong> ${document.getElementById('hotelRooms').value}</p>
+                    <p><strong>Star Rating:</strong> ${document.getElementById('hotelStars').value}</p>
+                    
+                    <h3 style="margin-top: 30px;">Revenue Centers</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr style="background: #FFB627; color: #0f0505;">
+                            <th style="padding: 10px; text-align: left;">RVC Name</th>
+                            <th style="padding: 10px; text-align: right;">Base Price</th>
+                            <th style="padding: 10px; text-align: right;">Multiplier</th>
+                            <th style="padding: 10px; text-align: right;">Qty</th>
+                            <th style="padding: 10px; text-align: right;">Total</th>
+                        </tr>
+                        ${rvcs.map(rvc => `
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 10px;">${rvc.name}</td>
+                                <td style="padding: 10px; text-align: right;">R ${(rvc.basePrice || 0).toLocaleString()}</td>
+                                <td style="padding: 10px; text-align: right;">x${rvc.multiplier || 1}</td>
+                                <td style="padding: 10px; text-align: right;">${rvc.quantity || 1}</td>
+                                <td style="padding: 10px; text-align: right;">R ${((rvc.basePrice || 0) * (rvc.multiplier || 1) * (rvc.quantity || 1)).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+
+                    <h3 style="margin-top: 30px; color: #FFB627;">INVESTMENT SUMMARY</h3>
+                    <p style="font-size: 18px; font-weight: 700;"><strong>Monthly:</strong> R ${monthly.toLocaleString()}</p>
+                    <p style="font-size: 18px; font-weight: 700;"><strong>Setup:</strong> R ${setup.toLocaleString()}</p>
+                    <p style="font-size: 16px; color: #FFB627;"><strong>Annual:</strong> R ${(setup + (monthly * 12)).toLocaleString()}</p>
+
+                    <h3 style="margin-top: 40px;">Terms & Conditions</h3>
+                    <p>1. Agreement: By signing below, Client agrees to the Orion Hotel Suite Service Agreement.</p>
+                    <p>2. Fees: Setup fee is non-refundable.</p>
+                    <p>3. SLA: 99.9% uptime commitment.</p>
+                    <p>4. Data: POPIA compliant, 48-hour personal data deletion, 2-year anonymized vault retention.</p>
+
+                    <div style="margin-top: 60px;">
+                        <p><strong>Signed:</strong> ${gmName}</p>
+                        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                    </div>
+
+                    <p style="margin-top: 60px; font-size: 10px; color: #999; text-align: center;">
+                        Built by Claude AI + Graham Schubach | Orion Dev Core<br/>
+                        ORION HOTEL SUITE v18.0 | Firebase Realtime Database
+                    </p>
+                </div>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: `orion-contract-${hotelName}-${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(content).save();
+            alert('✓ PDF Contract generated!');
+        }
+
+        // SAVE TO FIREBASE
+        function saveToFirebase() {
+            if (!db) {
+                alert('Firebase not connected. PDF saved locally.');
+                generatePDF();
+                return;
+            }
+
+            const hotelName = document.getElementById('hotelName').value;
+            if (!hotelName) {
+                alert('Please enter hotel name');
+                return;
+            }
+
+            const contractData = {
+                hotelName,
+                hotelCity: document.getElementById('hotelCity').value,
+                hotelRooms: document.getElementById('hotelRooms').value,
+                hotelStars: document.getElementById('hotelStars').value,
+                hotelEmail: document.getElementById('hotelEmail').value,
+                hotelPhone: document.getElementById('hotelPhone').value,
+                gmName: document.getElementById('gmName').value,
+                rvcs: rvcs,
+                signature: signatureCanvas.toDataURL(),
+                timestamp: new Date().toISOString(),
+                monthly: parseInt(document.getElementById('monthlyPrice').textContent.replace('R ', '').replace(/,/g, '')),
+                setup: parseInt(document.getElementById('setupPrice').textContent.replace('Setup: R ', '').replace(/,/g, ''))
+            };
+
+            const hotelId = hotelName.toLowerCase().replace(/\s/g, '-');
+            db.ref('contracts/' + hotelId).set(contractData)
+                .then(() => {
+                    alert('✓ Contract saved to Firebase!');
+                    generatePDF();
+                })
+                .catch(err => {
+                    alert('Firebase save error: ' + err.message);
+                    generatePDF();
+                });
+        }
+
+        // INITIALIZE
+        window.addEventListener('DOMContentLoaded', () => {
+            initSignaturePad();
+            renderRVCs();
+            calculatePrices();
+        });
+    </script>
+</body>
+</html>

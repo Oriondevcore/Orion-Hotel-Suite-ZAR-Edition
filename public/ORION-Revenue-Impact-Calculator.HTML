@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORION Revenue Impact Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0B1221 0%, #1a3a52 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            color: #FFB627;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Input Panel */
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .panel h2 {
+            font-size: 22px;
+            color: #0B1221;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #FFB627;
+            background: #fffbf0;
+        }
+
+        .range-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .range-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFB627;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, #FFB627 0%, transparent 100%);
+            margin: 25px 0;
+        }
+
+        .note {
+            background: #f0f0f0;
+            border-left: 4px solid #FFB627;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #555;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* Results Panel */
+        .results {
+            background: linear-gradient(135deg, #0B1221 0%, #1a3a52 100%);
+            color: white;
+        }
+
+        .result-item {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #FFB627;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #FFB627;
+            margin-bottom: 5px;
+        }
+
+        .result-desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.6;
+        }
+
+        .breakdown {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 10px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .chart-section h2 {
+            font-size: 22px;
+            color: #0B1221;
+            margin-bottom: 25px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        /* Scenarios */
+        .scenarios {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .scenarios h2 {
+            font-size: 22px;
+            color: #0B1221;
+            margin-bottom: 25px;
+        }
+
+        .scenario-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .scenario-card {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .scenario-card:hover {
+            border-color: #FFB627;
+            background: #fffbf0;
+            transform: translateY(-5px);
+        }
+
+        .scenario-card.active {
+            border-color: #FFB627;
+            background: #fffbf0;
+            box-shadow: 0 10px 30px rgba(255, 182, 39, 0.2);
+        }
+
+        .scenario-card h3 {
+            font-size: 16px;
+            color: #0B1221;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .scenario-card p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .scenario-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFB627;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid #FFB627;
+        }
+
+        .disclaimer p {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .disclaimer p:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .scenario-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1><i class="fas fa-chart-line"></i> ORION Revenue Impact Calculator</h1>
+        <p>See how AI-assisted guest service drives real hotel revenue</p>
+    </div>
+
+    <!-- Main Grid: Inputs + Results -->
+    <div class="main-grid">
+        <!-- Input Panel -->
+        <div class="panel">
+            <h2><i class="fas fa-sliders"></i> Hotel Parameters</h2>
+
+            <div class="form-group">
+                <label>Total Rooms</label>
+                <input type="number" id="rooms" value="78" min="1" max="500">
+                <div class="note">
+                    <i class="fas fa-info-circle"></i> The View Hotel has 78 rooms. Adjust for your property.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Average Occupancy Rate (%)</label>
+                <input type="range" id="occupancy" value="65" min="20" max="95" step="5">
+                <div class="range-display">
+                    <span>20%</span>
+                    <span class="range-value" id="occupancy-display">65%</span>
+                    <span>95%</span>
+                </div>
+                <div class="note">
+                    <i class="fas fa-info-circle"></i> South African 4-star average: 65-70%
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Current F&B Average Check (ZAR)</label>
+                <input type="number" id="check-size" value="450" min="100" max="2000" step="50">
+                <div class="note">
+                    <i class="fas fa-info-circle"></i> Per guest per transaction
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="form-group">
+                <label>Orion Impact Assumptions</label>
+                <select id="impact-level">
+                    <option value="conservative">Conservative (5-10% uplift)</option>
+                    <option value="moderate" selected>Moderate (10-20% uplift)</option>
+                    <option value="optimistic">Optimistic (20-30% uplift)</option>
+                </select>
+                <div class="note">
+                    <i class="fas fa-lightbulb"></i> Based on guest behavior psychology: currency friction removal + context-aware upselling.
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="panel results">
+            <h2><i class="fas fa-coins"></i> Monthly Impact</h2>
+
+            <div class="result-item">
+                <div class="result-label">F&B Revenue Uplift</div>
+                <div class="result-value" id="result-fdb">R 86,940</div>
+                <div class="result-desc">
+                    Additional F&B revenue from reduced currency friction + smart recommendations
+                </div>
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <span>Occupied rooms/month:</span>
+                        <span id="breakdown-rooms">1,689</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Current average:</span>
+                        <span id="breakdown-current">R 760,050</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>With Orion (+15%):</span>
+                        <span id="breakdown-orion">R 874,058</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Efficiency Savings</div>
+                <div class="result-value" id="result-savings">R 45,000</div>
+                <div class="result-desc">
+                    Staff time reclaimed from repetitive questions (~0.5 FTE value)
+                </div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Monthly Net Benefit</div>
+                <div class="result-value" id="result-net" style="color: #06a77d;">R 131,940</div>
+                <div class="result-desc">
+                    F&B uplift + efficiency gains (before system costs)
+                </div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Annualized Impact</div>
+                <div class="result-value" id="result-annual" style="font-size: 28px;">R 1,583,280</div>
+                <div class="result-desc">
+                    12-month revenue opportunity
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+        <h2><i class="fas fa-chart-bar"></i> Monthly Scenario Comparison</h2>
+        <div class="chart-container">
+            <canvas id="comparisonChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Scenarios -->
+    <div class="scenarios">
+        <h2><i class="fas fa-lightbulb"></i> Real-World Scenarios</h2>
+        <div class="scenario-cards">
+            <div class="scenario-card active" onclick="setScenario('conservative')">
+                <h3>🟡 Conservative</h3>
+                <p>
+                    Currency friction reduced slightly. Minimal upsell impact. Focus on operational efficiency.
+                </p>
+                <div class="scenario-value">+R 65,970/mo</div>
+            </div>
+            <div class="scenario-card" onclick="setScenario('moderate')">
+                <h3>🟢 Moderate</h3>
+                <p>
+                    Balanced approach. Currency clarity + smart recommendations. Most likely outcome.
+                </p>
+                <div class="scenario-value">+R 131,940/mo</div>
+            </div>
+            <div class="scenario-card" onclick="setScenario('optimistic')">
+                <h3>🔵 Optimistic</h3>
+                <p>
+                    Strong guest adoption. Personalized itineraries drive in-house dining. Scale rapidly.
+                </p>
+                <div class="scenario-value">+R 197,910/mo</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+        <p>
+            <strong>⚠️ Important Disclaimer:</strong> These calculations are based on industry benchmarks and guest behavior research, not guaranteed outcomes. Actual results will vary based on your guest demographics, seasonal patterns, staff adoption, and market conditions. This tool is for scenario planning only—not a promise of results.
+        </p>
+        <p>
+            <strong>Methodology:</strong> F&B uplift assumes 10-20% reduction in currency friction hesitation + 5-10% contextual upsell rate. Efficiency savings based on ~0.5 FTE value (R45K/month). These are conservative estimates grounded in hospitality AI research.
+        </p>
+    </div>
+</div>
+
+<script>
+    const hotelParams = {
+        rooms: 78,
+        occupancy: 0.65,
+        checkSize: 450,
+        impactLevel: 'moderate'
+    };
+
+    const impactLevels = {
+        conservative: { fdb: 0.075, efficiency: 0.6 },
+        moderate: { fdb: 0.15, efficiency: 1.0 },
+        optimistic: { fdb: 0.25, efficiency: 1.2 }
+    };
+
+    let comparisonChart = null;
+
+    function updateCalculations() {
+        // Get values
+        const rooms = parseInt(document.getElementById('rooms').value);
+        const occupancy = parseInt(document.getElementById('occupancy').value) / 100;
+        const checkSize = parseInt(document.getElementById('check-size').value);
+        const impactLevel = document.getElementById('impact-level').value;
+
+        // Update range display
+        document.getElementById('occupancy-display').textContent = document.getElementById('occupancy').value + '%';
+
+        // Get impact multipliers
+        const impact = impactLevels[impactLevel];
+
+        // Calculate occupied rooms per month
+        const occupiedRooms = Math.round(rooms * occupancy * 30);
+        document.getElementById('breakdown-rooms').textContent = occupiedRooms.toLocaleString();
+
+        // Calculate revenue impact
+        const currentFDB = occupiedRooms * checkSize;
+        const upliftPercent = impact.fdb * 100;
+        const fdbUplift = Math.round(currentFDB * impact.fdb);
+        const efficiencySavings = Math.round(45000 * impact.efficiency);
+        const monthlyNet = fdbUplift + efficiencySavings;
+        const annualImpact = monthlyNet * 12;
+
+        // Update breakdown
+        document.getElementById('breakdown-current').textContent = 'R ' + currentFDB.toLocaleString();
+        document.getElementById('breakdown-orion').textContent = 'R ' + (currentFDB + fdbUplift).toLocaleString();
+
+        // Update results
+        document.getElementById('result-fdb').textContent = 'R ' + fdbUplift.toLocaleString();
+        document.getElementById('result-savings').textContent = 'R ' + efficiencySavings.toLocaleString();
+        document.getElementById('result-net').textContent = 'R ' + monthlyNet.toLocaleString();
+        document.getElementById('result-annual').textContent = 'R ' + annualImpact.toLocaleString();
+
+        // Update chart
+        updateChart(checkSize, occupiedRooms, upliftPercent);
+    }
+
+    function updateChart(checkSize, occupiedRooms, upliftPercent) {
+        const currentFDB = occupiedRooms * checkSize;
+        const withOrion = Math.round(currentFDB * (1 + upliftPercent / 100));
+        const savings = Math.round(45000 * impactLevels[document.getElementById('impact-level').value].efficiency);
+
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+        if (comparisonChart) {
+            comparisonChart.destroy();
+        }
+
+        comparisonChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['F&B Revenue', 'Efficiency', 'Total Benefit'],
+                datasets: [
+                    {
+                        label: 'Current State (Monthly)',
+                        data: [currentFDB, 0, currentFDB],
+                        backgroundColor: '#999',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'With ORION (Monthly)',
+                        data: [withOrion, savings, withOrion + savings],
+                        backgroundColor: '#FFB627',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => 'R ' + (value / 1000).toFixed(0) + 'k'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function setScenario(level) {
+        document.getElementById('impact-level').value = level;
+        document.querySelectorAll('.scenario-card').forEach(el => el.classList.remove('active'));
+        event.target.closest('.scenario-card').classList.add('active');
+        updateCalculations();
+    }
+
+    // Event listeners
+    document.getElementById('rooms').addEventListener('change', updateCalculations);
+    document.getElementById('occupancy').addEventListener('input', updateCalculations);
+    document.getElementById('check-size').addEventListener('change', updateCalculations);
+    document.getElementById('impact-level').addEventListener('change', updateCalculations);
+
+    // Initialize
+    updateCalculations();
+</script>
+
+</body>
+</html>

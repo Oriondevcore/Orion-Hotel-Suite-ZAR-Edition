@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Dev Core | Hotel Terminology</title>
+    
+    <!-- Fonts: Quicksand (Requested) + Playfair Display (For Luxury Headings) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styling & Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'burj-blue': '#002B5B',
+                        'burj-dark': '#0a192f',
+                        'burj-gold': '#D4AF37',
+                        'burj-gold-light': '#F3E5AB',
+                        'burj-gold-dark': '#AA8C2C',
+                        'burj-cream': '#F9F9F9',
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Luxury Custom CSS Overrides */
+        body {
+            background-color: #0a192f;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 20%);
+            color: #F9F9F9;
+            overflow-x: hidden;
+        }
+
+        /* Gold Gradient Text */
+        .text-gradient-gold {
+            background: linear-gradient(to right, #D4AF37, #F3E5AB, #D4AF37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(0, 43, 91, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.6);
+            background: rgba(0, 43, 91, 0.6);
+            box-shadow: 0 15px 40px 0 rgba(212, 175, 55, 0.15);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a192f; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #AA8C2C; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #F3E5AB; 
+        }
+
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-left-color: #D4AF37;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Navigation Active State */
+        .nav-letter.active {
+            background-color: #D4AF37;
+            color: #002B5B;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Utility to hide scrollbar for the nav ribbon */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col font-sans">
+
+    <!-- Header / Hero Section -->
+    <header class="relative z-10 pt-16 pb-12 px-6 text-center">
+        <!-- Decorative Top Line -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-burj-gold to-transparent"></div>
+        
+        <div class="max-w-4xl mx-auto animate-fade-in-up">
+            <p class="text-burj-gold text-sm tracking-[0.3em] uppercase mb-4 font-serif">Curated by Orion Dev Core</p>
+            <h1 class="text-5xl md:text-7xl font-serif font-bold mb-6 text-gradient-gold">
+                Hotel Terminology
+            </h1>
+            <p class="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                The definitive glossary for the hospitality elite. A digestible source for definitions and explanations assembled by industry veterans.
+            </p>
+        </div>
+    </header>
+
+    <!-- Sticky Navigation & Search -->
+    <div class="sticky top-0 z-50 bg-burj-dark/95 backdrop-blur-md border-b border-burj-gold/30 shadow-2xl transition-all duration-300" id="sticky-nav">
+        <div class="max-w-7xl mx-auto px-6 py-5">
+            <div class="flex flex-col md:flex-row gap-10 items-center justify-between">
+                
+                <!-- Search Input -->
+                <div class="relative w-full md:w-96 group shrink-0">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-burj-gold group-hover:text-white transition-colors"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search terminology..." 
+                        class="w-full pl-10 pr-4 py-3 bg-burj-blue/50 border border-burj-gold/30 rounded-none focus:outline-none focus:border-burj-gold text-white placeholder-gray-400 transition-all font-light tracking-wide shadow-inner"
+                    >
+                </div>
+
+                <!-- A-Z Navigation -->
+                <div class="w-full flex-grow overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+                    <div class="flex space-x-3 md:justify-end items-center min-w-max px-2" id="letter-nav">
+                        <!-- Letters injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-7xl">
+        <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Cards injected by JS -->
+        </div>
+
+        <!-- No Results State -->
+        <div id="no-results" class="hidden text-center py-20">
+            <i class="fas fa-concierge-bell text-6xl text-burj-gold/20 mb-4"></i>
+            <h3 class="text-2xl font-serif text-burj-gold">No matches found</h3>
+            <p class="text-gray-400 mt-2 font-light">Try adjusting your search query.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-burj-gold/20 bg-burj-blue/30 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-center md:text-left mb-6 md:mb-0">
+                <h4 class="font-serif text-2xl text-burj-gold mb-2">ORION DEV CORE</h4>
+                <p class="text-gray-400 text-sm font-light">Excellence in Hospitality Technology.</p>
+            </div>
+            <div class="flex space-x-6 text-burj-gold/70">
+                <a href="#" class="hover:text-burj-gold transition-colors"><i class="fab fa-linkedin text-xl"></i></a>
+                <a href="#" class="hover:text-burj-gold transition-colors"><i class="fas fa-globe text-xl"></i></a>
+                <a href="#" class="hover:text-burj-gold transition-colors"><i class="fas fa-envelope text-xl"></i></a>
+            </div>
+        </div>
+        <div class="bg-black/40 text-center py-4 text-xs text-gray-500 tracking-widest uppercase">
+            &copy; 2026 Orion Dev Core. All Rights Reserved.
+        </div>
+    </footer>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // Data extracted from user request
+        const glossaryData = [
+            { term: "Adjusted Gross Operating Profit", acronym: "AGOP", def: "Beyond simply looking at revenue, AGOP also takes into account the operating expenses specific to running a hotel — an incredibly important consideration as the rates of inflation, goods and services continue to rise." },
+            { term: "Average Bed Rate", acronym: "ABR", def: "An important metric for hoteliers. Unlike ADR (room revenue), ABR looks at revenue generated per bed occupied. It helps hotels with multiple room types analyze revenue sources and market to specific guests." },
+            { term: "Average Treatment Rate", acronym: "ATR", def: "Defined as the average amount each guest spends on spa treatments during their stay, representing a vital indicator of your spa's financial health and guest engagement." },
+            { term: "Average Rate per Guest", acronym: "ARG", def: "A metric that helps hotel operators understand operations, assess pricing strategy and overall revenue performance, and predict future earnings." },
+            { term: "Aparthotel", acronym: "", def: "A cross between a traditional hotel room and an apartment. They feature comforts of home (kitchens, laundry) but retain perks of a hotel (housekeeping, amenities)." },
+            { term: "Average Rate Index", acronym: "ARI", def: "A measure of the average rate charged by a hotel in a particular market compared to other hotels in the same market. Typically calculated on a monthly basis." },
+            { term: "Adjusted Revenue per Available Room", acronym: "ARPAR", def: "A metric that takes a variety of factors into account that influence hotel revenue. It provides a more accurate view of profitability than RevPAR." },
+            { term: "Average Length of Stay", acronym: "ALOS", def: "A measure used to assess the average number of nights that a guest stays in a particular hotel, helping inform managers of the average revenue generated per guest." },
+            { term: "Average Daily Rate", acronym: "ADR", def: "Calculated by dividing total room revenue by the number of rooms sold. It helps analyze performance and compare hotels in the same market." },
+            { term: "Best Available Rate", acronym: "BAR", def: "Strategic pricing offering the lowest viable rate for a room. Typically non-refundable, cannot be combined with promotions, and is set based on dynamic pricing." },
+            { term: "Booking Pace", acronym: "", def: "Also known as reservation velocity. Understanding how quickly individuals are booking rooms for specific dates allows hoteliers to adjust pricing in real-time." },
+            { term: "Best Rate Guarantee", acronym: "BRG", def: "A promise made by a hotel to guests that they will receive the lowest available rate for their stay, used to build trust and encourage direct bookings." },
+            { term: "Central Reservation Office", acronym: "CRO", def: "A centralized department handling bookings across multiple properties within a brand, consolidating availability, rates, and guest data." },
+            { term: "Constrained Demand", acronym: "", def: "Occurs when a hotel is unable to fulfill booking requests due to internal limitations (no availability) or external factors (peak seasons)." },
+            { term: "Competitive Set", acronym: "Compset", def: "A group of 5 to 10 direct competitor hotels. Analyzing a compset helps strategize marketing, operations, and offering optimization." },
+            { term: "Chain Hotels", acronym: "", def: "A group of hotels operating under the same brand and standardized business model. Includes chains, franchises, and branded hotels." },
+            { term: "Central Reservation System", acronym: "CRS", def: "Software acting as a central hub for reservation needs, centralizing data and automating tasks to increase revenue and satisfaction." },
+            { term: "Customer Satisfaction", acronym: "CSAT", def: "A measure of how satisfied a customer is with products and services, typically measured via surveys, ratings, and feedback." },
+            { term: "Cost per Occupied Room", acronym: "CPOR", def: "Total operating cost divided by the number of occupied rooms. Used to track efficiency and compare performance against competitors." },
+            { term: "Distressed Inventory", acronym: "", def: "Refers to unused hotel rooms that remain unbooked on a particular day, close to their 'sell-by' date (the night of the stay)." },
+            { term: "Days Before Arrival", acronym: "DBA", def: "The period leading up to a guest's arrival. A critical window to connect with guests, enhance pre-arrival experience, and upsell." },
+            { term: "Experiential Travel", acronym: "", def: "Also known as immersive travel. Goes beyond sightseeing, focusing on immersive experiences that allow guests to truly connect with a place." },
+            { term: "Function Room Occupancy", acronym: "", def: "The percentage of function space that is booked and utilized, vital for event planning and revenue management." },
+            { term: "Flagship Hotel", acronym: "", def: "A chain's most prestigious property, serving as a benchmark for the brand and showcasing the highest standards of luxury and service." },
+            { term: "Full-Service Hotels", acronym: "", def: "Hotels catering to travelers seeking luxury and convenience, offering a wide range of amenities, dining, and services." },
+            { term: "Global Distribution System", acronym: "GDS", def: "A network connecting hotels, airlines, and agencies. It acts as a digital bridge linking room inventory with travel agents worldwide." },
+            { term: "Green Hotels", acronym: "", def: "Hotels committed to minimizing environmental impact through resource conservation, waste reduction, and lowering carbon footprints." },
+            { term: "Gross Operating Profit per Available Room", acronym: "GOPPAR", def: "Total gross operating profit divided by total available rooms. Indicates a hotel's financial health and revenue-generating potential." },
+            { term: "Hotel Franchise Contract", acronym: "", def: "A contract outlining the fees, brand standards, and operational support a franchisee can expect from the parent brand." },
+            { term: "Hotel Room Inventory", acronym: "", def: "The total number of rooms available to sell. Must be updated across all channels (OTA, phone, online) to avoid overbooking." },
+            { term: "Hotel Classification", acronym: "", def: "Star ratings and property categories (e.g., resort, boutique) that give guests a framework of what to expect." },
+            { term: "Hotel Administration Costs", acronym: "", def: "Expenses associated with the general operation of a hotel, including management salaries, office supplies, and legal fees." },
+            { term: "Hotel Folio", acronym: "", def: "Also called a guest bill. Recaps every charge throughout a guest's stay ensures accurate billing upon checkout." },
+            { term: "Hotel Revenue Management", acronym: "", def: "Strategic process of setting rates, controlling inventory, and maximizing profit using dynamic pricing and forecasting." },
+            { term: "Hotel Capacity", acronym: "", def: "The maximum number of rooms or guests a hotel can accommodate at any given time." },
+            { term: "Hospitality Management", acronym: "", def: "Overseeing all aspects of running a lodging establishment, from sales and guest services to operations and HR." },
+            { term: "Hotel Market Intelligence", acronym: "", def: "Gathering and analyzing data on competitors, guest behavior, and market trends to gain a competitive edge." },
+            { term: "Hotel Asset Management", acronym: "", def: "Strategic oversight of hotel operations to achieve an owner's investment goals, focusing on profitability and long-term value." },
+            { term: "Independent Hotel", acronym: "", def: "Privately owned properties offering distinct experiences reflecting the owner's character, free from chain standardization." },
+            { term: "Last Room Availability", acronym: "", def: "Agreements with groups/agencies guaranteeing they can book the last available room even during busy times, often overriding dynamic pricing." },
+            { term: "Length of Stay Discount", acronym: "", def: "Incentivizing guests to stay longer (e.g., 3+ nights) by offering a reduced nightly rate." },
+            { term: "Lead Time Restrictions", acronym: "", def: "Minimum number of days a guest is required to book in advance, often applied to promotions or high demand periods." },
+            { term: "Limited Service Hotels", acronym: "", def: "Budget-friendly accommodations prioritizing comfortable essentials over extensive amenities like room service or bellhops." },
+            { term: "Market Penetration Index", acronym: "MPI", def: "Measures a hotel's share of the market relative to its competitors. A useful measure of relative performance." },
+            { term: "Net Promoter Score", acronym: "NPS", def: "A metric used to measure customer loyalty and satisfaction based on how likely guests are to recommend the hotel." },
+            { term: "Net Operating Income", acronym: "NOI", def: "A measure of a hotel's profitability. Varies by market and should be judged against comparable properties in the compset." },
+            { term: "Online Travel Agent", acronym: "OTA", def: "Third-party platforms (like Expedia, Booking.com) allowing travelers to research and book. Critical for distribution." },
+            { term: "Occupancy Rate", acronym: "", def: "Percentage of available rooms that are occupied. Calculated by dividing occupied rooms by total available rooms." },
+            { term: "Property Management System", acronym: "PMS", def: "Software streamlining critical operations: reservations, housekeeping, guest data, reporting, and experience management." },
+            { term: "Remote Revenue Management", acronym: "", def: "Using cloud technology to access real-time data and manage pricing/strategy from off-site locations." },
+            { term: "Revenue Generating Index", acronym: "RGI", def: "Also known as RevPAR Index. Calculated by dividing a property’s RevPAR by the market average. >100 means outperforming the market." },
+            { term: "Revenue per Available Customer", acronym: "RevPAC", def: "Measures the average revenue generated from each customer per night, not just room revenue." },
+            { term: "Revenue per Available Room", acronym: "RevPAR", def: "Total room revenue divided by available rooms. The standard metric for analyzing hotel performance." },
+            { term: "Time per Table Turnaround", acronym: "", def: "The time from when diners sit until the table is ready for the next group. Crucial for restaurant revenue management." },
+            { term: "Total Revenue per Available Room", acronym: "TRevPAR", def: "Measures total revenue (rooms + F&B + spa, etc.) per available room. A holistic view of revenue generation." },
+            { term: "Unconstrained Demand", acronym: "", def: "Total demand for rooms if there were no capacity limits. Helps understand true market potential." },
+            { term: "Yield Management", acronym: "", def: "Dynamic pricing strategy to maximize revenue: selling the right room to the right guest at the right time for the right price." },
+            { term: "Zero-Based Budgeting", acronym: "ZBB", def: "Budgeting method where all expenses must be justified from scratch for each period, rather than basing it on previous years." },
+        ];
+
+        // Sort Data Alphabetically
+        glossaryData.sort((a, b) => a.term.localeCompare(b.term));
+
+        const resultsContainer = document.getElementById('results-container');
+        const letterNav = document.getElementById('letter-nav');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('no-results');
+
+        // Initial Render
+        function init() {
+            renderLetters();
+            renderCards(glossaryData);
+        }
+
+        // Generate A-Z Navigation
+        function renderLetters() {
+            const letters = ['All', ...new Set(glossaryData.map(item => item.term.charAt(0).toUpperCase()))];
+            
+            letterNav.innerHTML = letters.map(letter => `
+                <button 
+                    onclick="filterByLetter('${letter}')"
+                    class="nav-letter w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium text-burj-gold border border-burj-gold/30 hover:bg-burj-gold hover:text-burj-dark transition-all duration-300 ${letter === 'All' ? 'w-16 rounded-full' : ''} ${letter === 'All' ? 'active' : ''}"
+                    data-letter="${letter}"
+                >
+                    ${letter}
+                </button>
+            `).join('');
+        }
+
+        // Render Terms
+        function renderCards(data) {
+            resultsContainer.innerHTML = '';
+            
+            if (data.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'glass-card p-8 rounded-xl flex flex-col h-full relative overflow-hidden group opacity-0';
+                card.style.animation = `fadeIn 0.5s ease forwards ${index * 0.05}s`;
+
+                const acronymHTML = item.acronym ? `<span class="ml-2 text-sm font-serif text-burj-gold/70 border border-burj-gold/30 px-2 py-0.5 rounded tracking-widest">${item.acronym}</span>` : '';
+
+                card.innerHTML = `
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <i class="fas fa-gem text-6xl text-burj-gold"></i>
+                    </div>
+                    <div class="mb-4 border-b border-burj-gold/20 pb-4">
+                        <h3 class="text-xl font-serif font-bold text-burj-gold group-hover:text-white transition-colors">
+                            ${item.term}
+                            ${acronymHTML}
+                        </h3>
+                    </div>
+                    <p class="text-gray-300 font-light leading-relaxed flex-grow">
+                        ${item.def}
+                    </p>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // Filter Logic
+        function filterByLetter(letter) {
+            // Update Active State
+            document.querySelectorAll('.nav-letter').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.dataset.letter === letter) btn.classList.add('active');
+            });
+
+            // Clear Search
+            searchInput.value = '';
+
+            // Filter
+            if (letter === 'All') {
+                renderCards(glossaryData);
+            } else {
+                const filtered = glossaryData.filter(item => item.term.charAt(0).toUpperCase() === letter);
+                renderCards(filtered);
+            }
+        }
+
+        // Search Logic
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            // Reset Navigation Active State
+            document.querySelectorAll('.nav-letter').forEach(btn => btn.classList.remove('active'));
+
+            const filtered = glossaryData.filter(item => 
+                item.term.toLowerCase().includes(query) || 
+                item.acronym.toLowerCase().includes(query) ||
+                item.def.toLowerCase().includes(query)
+            );
+            renderCards(filtered);
+        });
+
+        // Add Animation Keyframe dynamically
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Initialize
+        init();
+
+    </script>
+</body>
+</html>

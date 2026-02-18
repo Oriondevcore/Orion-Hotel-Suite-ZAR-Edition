@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI - ORION Hotel Concierge</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { font-family: 'Space Grotesk', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #0f0505 0%, #1a0a0a 50%, #0B1221 100%);
+            color: #e0e0e0;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            height: 100vh;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #1a0a0a 0%, #0B1221 100%);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #8B2500 0%, #C15817 100%);
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #FFB627;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-header p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: #FFB627;
+            color: #0f0505;
+            font-weight: 500;
+        }
+
+        .message.bot .message-bubble {
+            background: rgba(255, 182, 39, 0.1);
+            border: 1px solid #FFB627;
+            color: #e0e0e0;
+        }
+
+        .message.system .message-bubble {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 182, 39, 0.3);
+            color: #999;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 182, 39, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .input-form {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem;
+            background: rgba(255, 182, 39, 0.05);
+            border: 1px solid #FFB627;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            background: rgba(255, 182, 39, 0.1);
+            border-color: #FFD966;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 182, 39, 0.5);
+        }
+
+        .send-btn {
+            padding: 0.75rem 1.25rem;
+            background: #FFB627;
+            color: #0f0505;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #FFD966;
+            transform: translateY(-2px);
+        }
+
+        .send-btn:disabled {
+            background: rgba(255, 182, 39, 0.5);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FFB627;
+            animation: bounce 1.4s infinite;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { opacity: 0.5; }
+            40% { opacity: 1; }
+        }
+
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: linear-gradient(135deg, #1a0a0a 0%, #0B1221 100%);
+            border: 2px solid #FFB627;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-card h1 {
+            text-align: center;
+            color: #FFB627;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 182, 39, 0.05);
+            border: 1px solid #FFB627;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .login-input:focus {
+            outline: none;
+            background: rgba(255, 182, 39, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #FFB627;
+            color: #0f0505;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #FFD966;
+        }
+
+        .metrics {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem;
+            background: rgba(255, 182, 39, 0.1);
+            border-top: 1px solid rgba(255, 182, 39, 0.2);
+            font-size: 0.75rem;
+            color: #FFB627;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-container">
+    <div class="login-card">
+        <h1>Claude AI</h1>
+        <p style="text-align: center; color: #FFB627; margin-bottom: 2rem; font-size: 0.9rem;">ORION Concierge System</p>
+        
+        <input type="text" id="login-name" class="login-input" placeholder="Your Name *" required>
+        <input type="tel" id="login-phone" class="login-input" placeholder="Phone Number *" required>
+        <input type="number" id="login-room" class="login-input" placeholder="Room Number (optional)">
+        <select id="login-mode" class="login-input">
+            <option value="guest">🏨 Guest</option>
+            <option value="reservation">📋 Reservation Inquiry</option>
+            <option value="staff">👥 Staff</option>
+        </select>
+        <button onclick="login()" class="login-btn">
+            <i class="fas fa-sign-in-alt mr-2"></i> Enter
+        </button>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255, 182, 39, 0.05); border-radius: 8px; font-size: 0.85rem; color: #999;">
+            <i class="fas fa-lock mr-2"></i>
+            <strong>POPIA Compliant:</strong> Your data is encrypted and only used for your stay. We'll contact you via phone if needed.
+        </div>
+    </div>
+</div>
+
+<!-- CHAT SCREEN (Hidden initially) -->
+<div id="chat-screen" class="chat-container hidden">
+    
+    <!-- Header -->
+    <div class="chat-header">
+        <h1>🤖 Claude AI</h1>
+        <p id="header-info">Your ORION Concierge</p>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chatMessages">
+        <div class="message system">
+            <div class="message-bubble">
+                Welcome to Claude AI - ORION's intelligent concierge. I'm powered by Claude AI and trained on your hotel data. All conversations are logged for training and quality assurance.
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Footer -->
+    <div class="metrics">
+        <div class="metric-item">
+            <span class="metric-value" id="metric-tokens">0</span>
+            <span>Tokens Used</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-value" id="metric-cost">R0.00</span>
+            <span>Cost</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-value" id="metric-latency">0ms</span>
+            <span>Latency</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-value" id="metric-mode">GUEST</span>
+            <span>Mode</span>
+        </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+        <form class="input-form" id="messageForm">
+            <input 
+                type="text" 
+                id="messageInput" 
+                class="chat-input" 
+                placeholder="Type your message..." 
+                autocomplete="off"
+            >
+            <button type="submit" class="send-btn" id="sendBtn">Send</button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // ========================================================================
+    // FIREBASE INITIALIZATION
+    // ========================================================================
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAN0A1bxCkFfSUXdUGdI-7OBgrS9GFveG4",
+        authDomain: "orion-hotel-afcc6.firebaseapp.com",
+        projectId: "orion-hotel-afcc6",
+        storageBucket: "orion-hotel-afcc6.appspot.com",
+        messagingSenderId: "674729978141",
+        appId: "1:674729978141:web:77799f41fc9ff4a7ba59f4",
+        measurementId: "G-1RXEQRGLDE"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ========================================================================
+    // STATE
+    // ========================================================================
+    
+    let sessionId = generateSessionId();
+    let currentUser = null;
+    let currentPhone = null;
+    let currentMode = 'guest';
+    let currentRoom = null;
+    let chatHistory = [];
+    let isWaiting = false;
+    let totalTokens = 0;
+
+    // ========================================================================
+    // LOGIN LOGIC
+    // ========================================================================
+    
+    function login() {
+        const name = document.getElementById('login-name').value.trim();
+        const phone = document.getElementById('login-phone').value.trim();
+        const room = document.getElementById('login-room').value.trim() || 'WALK-IN';
+        const mode = document.getElementById('login-mode').value;
+
+        if (!name || !phone) {
+            alert('Please enter name and phone number');
+            return;
+        }
+
+        currentUser = name;
+        currentPhone = phone;
+        currentMode = mode;
+        currentRoom = room;
+        sessionId = generateSessionId();
+
+        // Show chat, hide login
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('chat-screen').classList.remove('hidden');
+
+        // Update header
+        const modeEmoji = mode === 'guest' ? '🏨' : mode === 'staff' ? '👥' : '📋';
+        const roomDisplay = room === 'WALK-IN' ? 'Walk-in' : `Room ${room}`;
+        document.getElementById('header-info').textContent = `${modeEmoji} ${name} • ${roomDisplay}`;
+        document.getElementById('metric-mode').textContent = mode.toUpperCase();
+
+        // Focus input
+        document.getElementById('messageInput').focus();
+
+        // Initial greeting
+        const greeting = mode === 'reservation' 
+            ? `Hi ${name}! I'm Claude AI. Thanks for your interest in ORION. How can I help with your reservation?`
+            : `Hi ${name}! I'm Claude AI, your intelligent concierge. How can I help you today?`;
+        addMessage(greeting, 'bot');
+    }
+
+    // ========================================================================
+    // CHAT LOGIC
+    // ========================================================================
+    
+    document.getElementById('messageForm').addEventListener('submit', handleSendMessage);
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+        }
+    });
+
+    async function handleSendMessage(e) {
+        e.preventDefault();
+
+        const message = document.getElementById('messageInput').value.trim();
+        if (!message) return;
+
+        isWaiting = true;
+        document.getElementById('sendBtn').disabled = true;
+        document.getElementById('messageInput').value = '';
+
+        // Display user message
+        addMessage(message, 'user');
+        chatHistory.push({ role: 'user', content: message });
+
+        // Show typing indicator
+        const typingEl = addMessage('', 'bot');
+
+        try {
+            const startTime = Date.now();
+
+            // Call Claude API
+            const response = await callClaudeAPI(message);
+
+            const latency = Date.now() - startTime;
+
+            // Remove typing indicator
+            typingEl.remove();
+
+            // Display response
+            addMessage(response.text, 'bot');
+            chatHistory.push({ role: 'bot', content: response.text });
+
+            // Update metrics
+            totalTokens += response.inputTokens + response.outputTokens;
+            document.getElementById('metric-tokens').textContent = totalTokens;
+            document.getElementById('metric-cost').textContent = `R${(totalTokens * 0.00000015).toFixed(4)}`;
+            document.getElementById('metric-latency').textContent = `${latency}ms`;
+
+            // Log to Firebase vault
+            await logToVault(message, response.text, response.inputTokens + response.outputTokens, latency);
+
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage('I encountered an issue. Please try again or contact the front desk.', 'bot');
+        } finally {
+            isWaiting = false;
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('messageInput').focus();
+        }
+    }
+
+    async function callClaudeAPI(userMessage) {
+        // Build context
+        const hotelContext = `
+You are Claude AI, the intelligent concierge for ORION Hotel Suite at Doonside, Amanzimtoti, Durban, KZN.
+
+HOTEL INFORMATION:
+- Name: ZAR Hotel (Sister to The View Boutique Hotel & Spa)
+- Location: 2 Harmony Place, Kingsburgh/Amanzimtoti
+- Contact: +27 (31) 001 0788 | bookings@zarhotel.com
+
+DINING:
+- "Monkey Man" Burger Bar: Gourmet burgers, draught beers, live entertainment Fridays
+- "Black Fish" Restaurant: Breakfast daily 06:30-10:00
+- Room Service available
+
+AMENITIES:
+- RAZ Spa: Head & shoulder massages, nail treatments
+- Rooftop Pool: 180-degree ocean views (guests only)
+- WiFi: Free fiber (ZARGUEST/ZARGUEST)
+
+CURRENT GUEST/STAFF:
+- Name: ${currentUser}
+- Phone: ${currentPhone}
+- Room: ${currentRoom}
+- Mode: ${currentMode}
+
+If this is a RESERVATION INQUIRY (mode: reservation):
+- Be helpful about availability, rates, special offers
+- Suggest they call +27 (31) 001 0788 to confirm booking
+- Note: This conversation will be logged and we can call them back on ${currentPhone}
+
+POLICIES:
+- Check-in: 14:00 | Check-out: 10:00 (strict)
+- No sea views in rooms
+
+CONVERSATION HISTORY:
+${chatHistory.map(m => `${m.role === 'user' ? 'Guest' : 'Claude'}: ${m.content}`).join('\n')}
+
+Guest says: "${userMessage}"
+
+Provide a helpful, friendly response. Be concise. If asked about services, provide accurate information. If you don't know, direct to front desk at +27 (31) 001 0788.
+        `;
+
+        // Get Claude API key from environment (in production, this comes from server)
+        // For now, we'll use a placeholder that needs to be set
+        const claudeApiKey = localStorage.getItem('CLAUDE_API_KEY') || 'sk-ant-ap103-YOUR-KEY';
+
+        const url = 'https://api.anthropic.com/v1/messages';
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': claudeApiKey,
+                'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+                model: 'claude-opus-4-5-20251101',
+                max_tokens: 500,
+                messages: [
+                    {
+                        role: 'user',
+                        content: hotelContext
+                    }
+                ]
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        return {
+            text: data.content[0].text,
+            inputTokens: data.usage.input_tokens || 0,
+            outputTokens: data.usage.output_tokens || 0
+        };
+    }
+
+    async function logToVault(userMsg, botMsg, tokensUsed, latency) {
+        try {
+            await db.collection('hotels').doc('zar').collection('chat_vault').add({
+                sessionId,
+                user: currentUser,
+                phone: currentPhone,
+                room: currentRoom,
+                mode: currentMode,
+                userMessage: userMsg,
+                claudeResponse: botMsg,
+                tokensUsed,
+                latency,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                date: new Date().toISOString().split('T')[0],
+                status: 'logged',
+                contactMethod: 'phone'
+            });
+        } catch (e) {
+            console.error('Vault logging error:', e);
+        }
+    }
+
+    // ========================================================================
+    // UI HELPERS
+    // ========================================================================
+    
+    function addMessage(text, role) {
+        const messageEl = document.createElement('div');
+        messageEl.className = `message ${role}`;
+
+        const bubbleEl = document.createElement('div');
+        bubbleEl.className = 'message-bubble';
+
+        if (!text && role === 'bot') {
+            bubbleEl.innerHTML = '<div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+        } else {
+            bubbleEl.textContent = text;
+        }
+
+        messageEl.appendChild(bubbleEl);
+        document.getElementById('chatMessages').appendChild(messageEl);
+        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+
+        return messageEl;
+    }
+
+    function generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+</script>
+
+</body>
+</html>

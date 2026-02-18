@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Dev Core | Client Analysis: The View</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styling & Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'burj-blue': '#002B5B',
+                        'burj-dark': '#0a192f',
+                        'burj-gold': '#D4AF37',
+                        'burj-gold-light': '#F3E5AB',
+                        'burj-gold-dark': '#AA8C2C',
+                        'burj-cream': '#F9F9F9',
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Luxury Theme Consistency */
+        body {
+            background-color: #0a192f;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 20%);
+            color: #F9F9F9;
+            scroll-behavior: smooth;
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(to right, #D4AF37, #F3E5AB, #D4AF37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .glass-panel {
+            background: rgba(0, 43, 91, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        .glass-table-row:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* Sidebar Nav Active State */
+        .nav-item.active {
+            border-left: 4px solid #D4AF37;
+            background: linear-gradient(90deg, rgba(212,175,55,0.1) 0%, transparent 100%);
+            color: #D4AF37;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a192f; }
+        ::-webkit-scrollbar-thumb { background: #AA8C2C; border-radius: 4px; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 fixed h-full bg-burj-dark/95 border-r border-burj-gold/20 hidden lg:flex flex-col z-50">
+        <div class="p-8 border-b border-burj-gold/10">
+            <h2 class="text-2xl font-serif font-bold text-burj-gold">ORION <span class="text-white text-base block font-sans tracking-widest mt-1">HOTEL PORTFOLIO</span></h2>
+        </div>
+        <nav class="flex-1 py-6 overflow-y-auto">
+            <a href="#executive-summary" class="nav-item active flex items-center px-8 py-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-file-alt w-6"></i> <span class="text-sm font-medium tracking-wide">Executive Summary</span>
+            </a>
+            <a href="#location" class="nav-item flex items-center px-8 py-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-map-marker-alt w-6"></i> <span class="text-sm font-medium tracking-wide">Location & Context</span>
+            </a>
+            <a href="#accommodation" class="nav-item flex items-center px-8 py-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-bed w-6"></i> <span class="text-sm font-medium tracking-wide">Accommodation</span>
+            </a>
+            <a href="#gastronomy" class="nav-item flex items-center px-8 py-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-utensils w-6"></i> <span class="text-sm font-medium tracking-wide">Gastronomy</span>
+            </a>
+            <a href="#wellness" class="nav-item flex items-center px-8 py-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-spa w-6"></i> <span class="text-sm font-medium tracking-wide">Wellness</span>
+            </a>
+            <a href="#market" class="nav-item flex items-center px-8 py-4 text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-chart-line w-6"></i> <span class="text-sm font-medium tracking-wide">Market Position</span>
+            </a>
+        </nav>
+        <div class="p-6 border-t border-burj-gold/10">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span class="text-xs text-gray-400 uppercase tracking-widest">Client Active</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-64 p-6 lg:p-12 relative">
+        
+        <!-- Header -->
+        <header class="mb-12 border-b border-burj-gold/30 pb-8">
+            <p class="text-burj-gold text-xs tracking-[0.3em] uppercase mb-3 font-serif">Strategic Analysis</p>
+            <h1 class="text-4xl lg:text-5xl font-serif font-bold text-gradient-gold mb-4">The View Boutique Hotel & Spa</h1>
+            <p class="text-gray-300 font-light text-lg">A Paradigm of Luxury Hospitality on the Sapphire Coast</p>
+        </header>
+
+        <!-- Executive Summary -->
+        <section id="executive-summary" class="mb-16">
+            <div class="glass-panel p-8 rounded-xl border-l-4 border-l-burj-gold">
+                <h3 class="text-2xl font-serif text-burj-gold mb-4">Executive Context</h3>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    Situated atop the coastal ridge of Doon Heights, The View Boutique Hotel represents a sophisticated synthesis of familial heritage and modern wellness infrastructure. Originally a private homestead (est. 1994), it has evolved into a premier destination for both the international leisure market and the domestic corporate sector.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div class="bg-burj-dark/50 p-4 rounded border border-burj-gold/10">
+                        <span class="block text-burj-gold text-sm uppercase tracking-widest mb-1">Establishment</span>
+                        <span class="text-xl font-serif text-white">5-Star Boutique</span>
+                    </div>
+                    <div class="bg-burj-dark/50 p-4 rounded border border-burj-gold/10">
+                        <span class="block text-burj-gold text-sm uppercase tracking-widest mb-1">Location</span>
+                        <span class="text-xl font-serif text-white">Amanzimtoti, KZN</span>
+                    </div>
+                    <div class="bg-burj-dark/50 p-4 rounded border border-burj-gold/10">
+                        <span class="block text-burj-gold text-sm uppercase tracking-widest mb-1">Key Focus</span>
+                        <span class="text-xl font-serif text-white">Wellness & Corporate</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Geospatial Context -->
+        <section id="location" class="mb-16">
+            <h3 class="text-3xl font-serif text-white mb-8 flex items-center gap-4">
+                <span class="w-12 h-[1px] bg-burj-gold"></span> Regional Connectivity
+            </h3>
+            <div class="glass-panel rounded-xl overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-burj-gold/10 text-burj-gold font-serif">
+                        <tr>
+                            <th class="p-4 border-b border-burj-gold/20">Metric</th>
+                            <th class="p-4 border-b border-burj-gold/20">Details</th>
+                            <th class="p-4 border-b border-burj-gold/20">Strategic Significance</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300 text-sm font-light">
+                        <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4 font-medium text-white">Primary Address</td>
+                            <td class="p-4">9 Hillside Road, Doon Heights</td>
+                            <td class="p-4">Elevated ridge location maximizes sea views.</td>
+                        </tr>
+                        <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4 font-medium text-white">Airport Distance</td>
+                            <td class="p-4">55 km - 63 km (King Shaka)</td>
+                            <td class="p-4">Facilitates international transit (45–60 min).</td>
+                        </tr>
+                        <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4 font-medium text-white">CBD Proximity</td>
+                            <td class="p-4">30 km to Durban</td>
+                            <td class="p-4">Ideal for "Bleisure" travelers.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Accommodation -->
+        <section id="accommodation" class="mb-16">
+            <h3 class="text-3xl font-serif text-white mb-8 flex items-center gap-4">
+                <span class="w-12 h-[1px] bg-burj-gold"></span> Accommodation Portfolio
+            </h3>
+            <p class="text-gray-400 mb-6 font-light">
+                The estate features 41-45 individually decorated rooms, employing a sophisticated segmentation strategy to cater to distinct traveler personas.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Card 1 -->
+                <div class="glass-panel p-6 rounded-xl hover:border-burj-gold/50 transition-colors">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-serif text-burj-gold">Corporate Tier</h4>
+                        <i class="fas fa-briefcase text-gray-500"></i>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-2 font-light">
+                        <li><strong class="text-white">Classic Standard:</strong> Essential luxury, workspace, high-speed Wi-Fi.</li>
+                        <li><strong class="text-white">Luxury Room:</strong> Timeless elegance, expansive living areas.</li>
+                    </ul>
+                </div>
+                <!-- Card 2 -->
+                <div class="glass-panel p-6 rounded-xl hover:border-burj-gold/50 transition-colors">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-xl font-serif text-burj-gold">Premium Tier</h4>
+                        <i class="fas fa-heart text-gray-500"></i>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-2 font-light">
+                        <li><strong class="text-white">Honeymoon Suite:</strong> Four-poster beds, private balconies, sea views.</li>
+                        <li><strong class="text-white">Grand Deluxe:</strong> Opulent finishes, panoramic vistas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="glass-panel rounded-xl overflow-x-auto">
+                <table class="w-full text-left min-w-[600px]">
+                    <thead class="bg-burj-gold/10 text-burj-gold font-serif">
+                        <tr>
+                            <th class="p-4">Category</th>
+                            <th class="p-4">Units</th>
+                            <th class="p-4">Demographic</th>
+                            <th class="p-4">Key Features</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300 text-sm font-light">
+                        <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4 font-medium text-white">Classic Standard</td>
+                            <td class="p-4 text-center">5</td>
+                            <td class="p-4">Business / Solo</td>
+                            <td class="p-4">En-suite shower, outside seating</td>
+                        </tr>
+                        <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4 font-medium text-white">Grand Deluxe Sea View</td>
+                            <td class="p-4 text-center">13</td>
+                            <td class="p-4">High-end Leisure</td>
+                            <td class="p-4">Panoramic views, opulent finishes</td>
+                        </tr>
+                         <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4 font-medium text-white">Three-Bedroom Villa</td>
+                            <td class="p-4 text-center">1</td>
+                            <td class="p-4">Families</td>
+                            <td class="p-4">Private pool, full kitchen</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Gastronomy -->
+        <section id="gastronomy" class="mb-16">
+            <div class="relative glass-panel rounded-xl p-8 overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-burj-gold opacity-5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+                <h3 class="text-3xl font-serif text-white mb-4">Giorgio’s Restaurant</h3>
+                <p class="text-burj-gold text-sm tracking-widest uppercase mb-6">Award-Winning Culinary Excellence</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-bold text-white mb-2">Philosophy</h4>
+                        <p class="text-gray-400 font-light mb-4">"Italian Fusion" — marrying classical Italian techniques with local South African ingredients. Helmed by Chef Lucky Sthembiso Ntuli.</p>
+                        <h4 class="text-lg font-bold text-white mb-2">Signature Dish</h4>
+                        <p class="text-gray-400 font-light">Fillet of beef on creamy potatoes and baby spinach, garnished with crispy onion rings and red wine jus.</p>
+                    </div>
+                    <div class="border-l border-burj-gold/20 pl-8">
+                         <h4 class="text-lg font-bold text-white mb-2">Beverage Program</h4>
+                         <p class="text-gray-400 font-light mb-4">Award-winning "Diamond Wine List" showcasing South African viticulture.</p>
+                         <div class="flex items-center gap-3 text-burj-gold">
+                             <i class="fas fa-wine-glass-alt"></i>
+                             <span class="font-serif italic">Fully Licensed & Honesty Bar</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wellness -->
+        <section id="wellness" class="mb-16">
+            <h3 class="text-3xl font-serif text-white mb-8 flex items-center gap-4">
+                <span class="w-12 h-[1px] bg-burj-gold"></span> Wellness Emporium
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Info -->
+                <div class="lg:col-span-1">
+                    <p class="text-gray-300 font-light mb-6">
+                        Winner of the Les Nouvelle Esthetiques Award (2018). Designed as a "tranquil oasis" with specialized hydrotherapy infrastructure including Detox Flotation Pools and Moroccan Rasul.
+                    </p>
+                    <div class="p-4 bg-burj-gold/10 rounded-lg border border-burj-gold/20">
+                        <span class="block text-burj-gold font-bold mb-1">Forecast 2025/26</span>
+                        <span class="text-xs text-gray-400">Pricing Strategy Active</span>
+                    </div>
+                </div>
+                <!-- Menu -->
+                <div class="lg:col-span-2 glass-panel rounded-xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-burj-dark/80 text-burj-gold text-xs uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3">Treatment</th>
+                                <th class="p-3">Duration</th>
+                                <th class="p-3 text-right">Price (ZAR)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm font-light text-gray-300">
+                            <tr class="border-b border-burj-gold/5">
+                                <td class="p-3">Swedish Full Body</td>
+                                <td class="p-3">60 min</td>
+                                <td class="p-3 text-right text-burj-gold">R600</td>
+                            </tr>
+                            <tr class="border-b border-burj-gold/5">
+                                <td class="p-3">Hot Stone Full Body</td>
+                                <td class="p-3">90 min</td>
+                                <td class="p-3 text-right text-burj-gold">R780</td>
+                            </tr>
+                            <tr class="border-b border-burj-gold/5">
+                                <td class="p-3">Detox Flotation Pool</td>
+                                <td class="p-3">30 min</td>
+                                <td class="p-3 text-right text-burj-gold">R200</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">Couples Signature Re-treat</td>
+                                <td class="p-3">120 min</td>
+                                <td class="p-3 text-right text-burj-gold font-bold">R2,500</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Position -->
+        <section id="market" class="mb-20">
+            <h3 class="text-3xl font-serif text-white mb-8 flex items-center gap-4">
+                <span class="w-12 h-[1px] bg-burj-gold"></span> Competitive Analysis
+            </h3>
+            <div class="glass-panel rounded-xl overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-burj-gold/10 text-burj-gold font-serif">
+                        <tr>
+                            <th class="p-4">Establishment</th>
+                            <th class="p-4">Rating</th>
+                            <th class="p-4">Base Rate (USD)</th>
+                            <th class="p-4">Core Differentiator</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300 text-sm font-light">
+                        <tr class="glass-table-row border-b border-burj-gold/10 bg-burj-gold/5">
+                            <td class="p-4 font-bold text-white">The View Boutique Hotel</td>
+                            <td class="p-4 text-burj-gold"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></td>
+                            <td class="p-4 font-medium text-white">$48 - $99</td>
+                            <td class="p-4">Hilltop sea views, award-winning spa</td>
+                        </tr>
+                        <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4">Protea Hotel Karridene</td>
+                            <td class="p-4 text-burj-gold/50"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></td>
+                            <td class="p-4">$34 - $45</td>
+                            <td class="p-4">Large-scale resort, beach access</td>
+                        </tr>
+                        <tr class="glass-table-row border-b border-burj-gold/10">
+                            <td class="p-4">African Sands</td>
+                            <td class="p-4 text-burj-gold/50"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></td>
+                            <td class="p-4">$66 - $76</td>
+                            <td class="p-4">Boutique Guesthouse, personalized</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-8 p-6 border border-burj-gold/30 rounded-xl bg-gradient-to-r from-burj-blue to-burj-dark">
+                <h4 class="text-xl font-serif text-burj-gold mb-2">Strategic Outlook</h4>
+                <p class="text-gray-300 font-light">
+                    The View is well-positioned to capitalize on <strong>Wellness Tourism</strong>, <strong>Bleisure Growth</strong>, and the local <strong>Staycation</strong> market. Its ability to offer 5-star facilities at competitive entry-level pricing creates a unique "value-luxury" proposition.
+                </p>
+            </div>
+        </section>
+
+    </main>
+    
+    <script>
+        // Simple active state toggler for sidebar
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Dev Core | AI Voice Features</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styling & Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'burj-blue': '#002B5B',
+                        'burj-dark': '#0a192f',
+                        'burj-gold': '#D4AF37',
+                        'burj-gold-light': '#F3E5AB',
+                        'burj-gold-dark': '#AA8C2C',
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a192f;
+            color: #F9F9F9;
+            overflow-x: hidden;
+        }
+
+        /* Hero Gradient */
+        .hero-bg {
+            background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.15), transparent 40%),
+                        linear-gradient(to bottom, #0a192f, #001f3f);
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(to right, #D4AF37, #F3E5AB, #D4AF37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* Feature Card */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(212, 175, 55, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #AA8C2C, #D4AF37);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Hero Section -->
+    <header class="hero-bg min-h-[60vh] flex items-center justify-center text-center px-6 relative overflow-hidden">
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-20 w-32 h-32 border border-burj-gold/10 rounded-full animate-pulse"></div>
+        <div class="absolute bottom-20 right-20 w-48 h-48 border border-burj-gold/10 rounded-full animate-pulse delay-700"></div>
+
+        <div class="max-w-4xl relative z-10 animate-fade-in-up">
+            <span class="inline-block py-1 px-3 border border-burj-gold/50 rounded-full text-burj-gold text-sm tracking-widest uppercase mb-6 bg-burj-gold/5">
+                Hospitality AI Revolution
+            </span>
+            <h1 class="text-5xl md:text-7xl font-serif font-bold mb-6 text-white">
+                More Bookings. <span class="text-gradient-gold block md:inline">Less Ringing.</span>
+            </h1>
+            <p class="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed mb-10">
+                Orion Dev Core AI Voice handles inbound calls to instantly answer guests, capture more revenue, and save your team time. Purpose-built for 5-star hospitality.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <button class="px-8 py-4 bg-gradient-to-r from-burj-gold-dark to-burj-gold text-burj-dark font-bold rounded hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all">
+                    Schedule a Demo
+                </button>
+                <button class="px-8 py-4 border border-burj-gold/50 text-burj-gold rounded hover:bg-burj-gold/10 transition-all">
+                    Listen to Samples
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Value Prop Stats -->
+    <section class="border-y border-burj-gold/20 bg-burj-dark/50 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-burj-gold/20">
+            <div>
+                <h3 class="text-4xl font-serif text-burj-gold mb-2">24/7</h3>
+                <p class="text-gray-400 font-light text-sm uppercase tracking-wider">Instant Availability</p>
+            </div>
+            <div>
+                <h3 class="text-4xl font-serif text-burj-gold mb-2">40%</h3>
+                <p class="text-gray-400 font-light text-sm uppercase tracking-wider">Calls Recovered</p>
+            </div>
+            <div>
+                <h3 class="text-4xl font-serif text-burj-gold mb-2">100%</h3>
+                <p class="text-gray-400 font-light text-sm uppercase tracking-wider">On-Brand Accuracy</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Features Grid -->
+    <section class="py-24 px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-serif text-white mb-4">Intelligent Assistants</h2>
+                <div class="w-24 h-1 bg-burj-gold mx-auto"></div>
+                <p class="mt-4 text-gray-400 font-light">One AI Model. Endless Possibilities.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="feature-card p-8 rounded-xl">
+                    <div class="icon-circle">
+                        <i class="fas fa-headset text-2xl text-burj-dark"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-3">AI Front Desk</h3>
+                    <p class="text-gray-400 font-light text-sm leading-relaxed">
+                        Answer guest and traveler inquiries instantly, reducing wait times and strictly eliminating the "on-hold" frustration.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card p-8 rounded-xl">
+                    <div class="icon-circle">
+                        <i class="fas fa-calendar-check text-2xl text-burj-dark"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-3">Central Reservations</h3>
+                    <p class="text-gray-400 font-light text-sm leading-relaxed">
+                        Handle reservations, provide real-time updates, and run a more efficient call center without adding staff.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card p-8 rounded-xl">
+                    <div class="icon-circle">
+                        <i class="fas fa-concierge-bell text-2xl text-burj-dark"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-3">AI Concierge</h3>
+                    <p class="text-gray-400 font-light text-sm leading-relaxed">
+                        Deliver personalized recommendations for dining, service, and local attractions based on your property's unique vibe.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card p-8 rounded-xl">
+                    <div class="icon-circle">
+                        <i class="fas fa-cash-register text-2xl text-burj-dark"></i>
+                    </div>
+                    <h3 class="text-xl font-serif text-white mb-3">AI Booking</h3>
+                    <p class="text-gray-400 font-light text-sm leading-relaxed">
+                        Effortlessly manage new bookings, modifications, and upsells, capturing revenue opportunities 24/7.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integration Section -->
+    <section class="py-20 bg-gradient-to-b from-transparent to-burj-blue/20">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12">
+            <div class="md:w-1/2">
+                <h2 class="text-3xl font-serif text-white mb-6">Seamless Integration</h2>
+                <p class="text-gray-300 font-light mb-8 text-lg">
+                    Sync with your existing Tech Stack. Our turnkey solution integrates with your PMS, CRS, CRM, booking engine, and payment systems.
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-center text-burj-gold">
+                        <i class="fas fa-check-circle mr-3"></i> <span class="text-white font-light">Custom Knowledge Base Training</span>
+                    </li>
+                    <li class="flex items-center text-burj-gold">
+                        <i class="fas fa-check-circle mr-3"></i> <span class="text-white font-light">Real-time Guest Communication</span>
+                    </li>
+                    <li class="flex items-center text-burj-gold">
+                        <i class="fas fa-check-circle mr-3"></i> <span class="text-white font-light">Unified Communication Inbox</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="md:w-1/2 relative">
+                <!-- Decorative Integration Graphic -->
+                <div class="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-xl relative z-10">
+                    <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-burj-gold flex items-center justify-center text-burj-dark font-bold"><i class="fas fa-robot"></i></div>
+                            <div>
+                                <div class="text-sm font-bold">Orion AI</div>
+                                <div class="text-xs text-green-400">Online</div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-400">Now</div>
+                    </div>
+                    <div class="space-y-4 text-sm">
+                        <div class="bg-white/10 p-3 rounded-lg rounded-tl-none self-start max-w-[80%]">
+                            Thank you for calling Orion Luxury. How may I assist with your reservation today?
+                        </div>
+                        <div class="bg-burj-gold/20 p-3 rounded-lg rounded-tr-none self-end ml-auto max-w-[80%] border border-burj-gold/30">
+                            I'd like to book a suite for next weekend.
+                        </div>
+                        <div class="bg-white/10 p-3 rounded-lg rounded-tl-none self-start max-w-[80%]">
+                            Certainly. I see availability for our Grand Deluxe Sea View. Shall I secure that for you?
+                        </div>
+                    </div>
+                </div>
+                <!-- Background Glow -->
+                <div class="absolute -top-10 -right-10 w-64 h-64 bg-burj-gold/20 rounded-full blur-3xl -z-10"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-burj-gold/20 bg-burj-dark py-12 text-center">
+        <h4 class="font-serif text-2xl text-burj-gold mb-2">ORION DEV CORE</h4>
+        <p class="text-gray-500 text-sm font-light uppercase tracking-widest">Excellence in Hospitality Technology</p>
+    </footer>
+
+    <!-- Simple Animation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in-up {
+                    animation: fadeInUp 0.8s ease-out forwards;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
